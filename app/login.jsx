@@ -15,6 +15,7 @@ import { theme } from "../constants/theme"
 import Input from "../components/Input"
 import Icon from "../assets/icons"
 import Button from "../components/Button"
+import { supabase } from "../lib/supabase"
 
 const Login = () => {
     const router = useRouter()
@@ -26,6 +27,25 @@ const Login = () => {
     const onSubmit = async () => {
         if (!emailRef.current || !passwordRef.current) {
             Alert.alert("Login", "Please fill all the fields")
+            return
+        }
+        //removing any blank spaces
+        let email = emailRef.current.trim()
+        let password = passwordRef.current.trim()
+
+        setLoading(true)
+
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        })
+
+        setLoading(false)
+
+        console.log("error: ", error)
+
+        if (error) {
+            Alert.alert("Login", error.message)
             return
         }
     }
@@ -45,11 +65,10 @@ const Login = () => {
             </View>
 
             {/**Form */}
-            <View style={styles.form}>
+            <View style={[styles.form, { paddingHorizontal: wp(3) }]}>
                 <Text
                     style={{
                         fontSize: hp(2),
-                        paddingHorizontal: 10,
                         color: theme.colors.text
                     }}
                 >
