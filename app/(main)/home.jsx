@@ -7,6 +7,7 @@ import { hp, wp } from "../../helpers/common"
 import { theme } from "../../constants/theme"
 import Icon from "../../assets/icons"
 import { useRouter } from "expo-router"
+import Avatar from "../../components/Avatar"
 
 const Home = () => {
     const { user, setAuth } = useAuth()
@@ -24,13 +25,15 @@ const Home = () => {
         }
     }
     return (
-        <ScreenWrapper>
+        <ScreenWrapper bg="white">
             <View style={styles.container}>
                 {/**Header */}
                 <View style={styles.header}>
                     <Text style={styles.title}>LinkUp</Text>
                     <View style={styles.icons}>
-                        <Pressable onPress={() => router.push("/notifications")}>
+                        <Pressable
+                            onPress={() => router.push("/notifications")}
+                        >
                             <Icon
                                 name="heart"
                                 size={hp(3.2)}
@@ -47,11 +50,11 @@ const Home = () => {
                             />
                         </Pressable>
                         <Pressable onPress={() => router.push("/profile")}>
-                            <Icon
-                                name="user"
-                                size={hp(3.2)}
-                                strokewidth={2}
-                                color={theme.colors.text}
+                            <Avatar
+                                uri={user?.image}
+                                size={hp(4.3)}
+                                rounded={theme.radius.sm}
+                                style={{ borderWidth: 2 }}
                             />
                         </Pressable>
                     </View>
