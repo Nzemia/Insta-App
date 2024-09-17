@@ -47,7 +47,7 @@ const SignUp = () => {
 
             {/**Form */}
             <View style={styles.form}>
-                <Text style={{ fontSize: hp(1.5), color: theme.colors.text }}>
+                <Text style={{ fontSize: hp(2), paddingHorizontal: 8, color: theme.colors.text }}>
                     Please fill the details to create an account
                 </Text>
                 <Input
@@ -74,7 +74,7 @@ const SignUp = () => {
             {/**Footer */}
             <View style={styles.footer}>
                 <Text style={styles.footerText}>Already have an account?</Text>
-                <Pressable>
+                <Pressable onPress={() => router.push("/login")}>
                     <Text
                         style={[
                             styles.footerText,
@@ -96,12 +96,12 @@ export default SignUp
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        gap: 45,
+        // flex: 1,
+        gap: 14,
         paddingHorizontal: wp(5)
     },
     welcomeText: {
-        fontSize: hp(4),
+        fontSize: hp(3.5),
         fontWeight: theme.fonts.bold,
         color: theme.colors.text
     },

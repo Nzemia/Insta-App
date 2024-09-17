@@ -1,4 +1,11 @@
-import { Alert, Pressable, StatusBar, StyleSheet, Text, View } from "react-native"
+import {
+    Alert,
+    Pressable,
+    StatusBar,
+    StyleSheet,
+    Text,
+    View
+} from "react-native"
 import React, { useRef, useState } from "react"
 import ScreenWrapper from "../components/ScreenWrapper"
 import BackButton from "../components/BackButton"
@@ -21,8 +28,8 @@ const Login = () => {
             Alert.alert("Login", "Please fill all the fields")
             return
         }
-        }
-    
+    }
+
     return (
         <ScreenWrapper bg="white">
             {/**For the icons i used  HugeIcons site*/}
@@ -39,7 +46,13 @@ const Login = () => {
 
             {/**Form */}
             <View style={styles.form}>
-                <Text style={{ fontSize: hp(1.5), color: theme.colors.text }}>
+                <Text
+                    style={{
+                        fontSize: hp(2),
+                        paddingHorizontal: 10,
+                        color: theme.colors.text
+                    }}
+                >
                     Please login to continue
                 </Text>
                 <Input
@@ -47,12 +60,14 @@ const Login = () => {
                     placeholder="Enter your Email"
                     onChangeText={value => (emailRef.current = value)}
                 />
+
                 <Input
                     icon={<Icon name="lock" size={26} strokewidth={1.6} />}
                     placeholder="Enter your Password"
                     secureTextEntry
                     onChangeText={value => (passwordRef.current = value)}
                 />
+
                 <Text style={styles.forgotPassword}>Forgot Password?</Text>
 
                 {/**Button */}
@@ -62,7 +77,7 @@ const Login = () => {
             {/**Footer */}
             <View style={styles.footer}>
                 <Text style={styles.footerText}>Don't have an account?</Text>
-                <Pressable>
+                <Pressable onPress={() => router.push("/signUp")}>
                     <Text
                         style={[
                             styles.footerText,
@@ -84,7 +99,7 @@ export default Login
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        // flex: 1,
         gap: 45,
         paddingHorizontal: wp(5)
     },
