@@ -36,7 +36,8 @@ const MainLayout = () => {
     }, [])
 
     const updatedUserData = async user => {
-        let response = await getUserData(user?.id)
+        // let response = await getUserData(user?.id)
+        let response = await setUserData(user?.id)
 
         if (response.success) {
             setUserData(response.data)
