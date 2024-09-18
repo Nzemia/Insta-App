@@ -1,8 +1,8 @@
-import { View, Text } from "react-native"
 import React, { useEffect } from "react"
 import { Stack, useRouter } from "expo-router"
 import { AuthProvider, useAuth } from "../contexts/AuthContext"
 import { supabase } from "../lib/supabase"
+import { getUserData } from "../services/userService"
 
 const _layout = () => {
     return (
@@ -22,8 +22,10 @@ const MainLayout = () => {
             if (session) {
                 //set auth
                 setAuth(session?.user)
+
                 //call the updated user data in table
-                updatedUserData(session?.user)
+                updatedUserData(session?.user, session?.user?.email)
+
                 //move to home screen
                 router.replace("/home")
             } else {
@@ -35,14 +37,10 @@ const MainLayout = () => {
         })
     }, [])
 
-    const updatedUserData = async user => {
-        // let response = await getUserData(user?.id)
-        let response = await setUserData(user?.id)
+    const updatedUserData = async (user, email) => {
+        let response = await getUserData(user?.id)
 
-        if (response.success) {
-            setUserData(response.data)
-        }
-        
+        if (response.success) setUserData({ ...response.data, email })
     }
     return (
         <Stack

@@ -2,7 +2,6 @@ import { Alert, Button, Pressable, StyleSheet, Text, View } from "react-native"
 import React from "react"
 import ScreenWrapper from "../../components/ScreenWrapper"
 import { useAuth } from "../../contexts/AuthContext"
-import { supabase } from "../../lib/supabase"
 import { hp, wp } from "../../helpers/common"
 import { theme } from "../../constants/theme"
 import Icon from "../../assets/icons"
@@ -15,15 +14,15 @@ const Home = () => {
 
     console.log("user: ", user)
 
-    const onLogout = async () => {
-        // setAuth(null)
-        const { error } = await supabase.auth.signOut()
+    // const onLogout = async () => {
+    //     // setAuth(null)
+    //     const { error } = await supabase.auth.signOut()
 
-        if (error) {
-            Alert.alert("Sign Out", "Theres was an error signing out!")
-            return
-        }
-    }
+    //     if (error) {
+    //         Alert.alert("Sign Out", "Theres was an error signing out!")
+    //         return
+    //     }
+    // }
     return (
         <ScreenWrapper bg="white">
             <View style={styles.container}>
@@ -60,7 +59,7 @@ const Home = () => {
                     </View>
                 </View>
             </View>
-            <Button title="logout" onPress={onLogout} />
+            {/* <Button title="logout" onPress={onLogout} /> */}
         </ScreenWrapper>
     )
 }

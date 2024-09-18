@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from "react-native"
+import { StyleSheet, TextInput, View } from "react-native"
 import React from "react"
 import { theme } from "../constants/theme"
 import { hp } from "../helpers/common"
@@ -8,7 +8,7 @@ const Input = props => {
         <View
             style={[
                 styles.container,
-                props.containerStyles && props.containerStyles
+                props.containerStyle && props.containerStyle
             ]}
         >
             {props.icon && props.icon}
