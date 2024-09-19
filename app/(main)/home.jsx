@@ -1,5 +1,13 @@
-import { Alert, Button, Pressable, StyleSheet, Text, View } from "react-native"
-import React from "react"
+import {
+    Alert,
+    Button,
+    FlatList,
+    Pressable,
+    StyleSheet,
+    Text,
+    View
+} from "react-native"
+import React, { useEffect, useState } from "react"
 import ScreenWrapper from "../../components/ScreenWrapper"
 import { useAuth } from "../../contexts/AuthContext"
 import { hp, wp } from "../../helpers/common"
@@ -7,6 +15,11 @@ import { theme } from "../../constants/theme"
 import Icon from "../../assets/icons"
 import { useRouter } from "expo-router"
 import Avatar from "../../components/Avatar"
+import { fetchPosts } from "../../services/postService"
+import PostCard from "../../components/PostCard"
+
+//custom global variable for fetching posts
+var limit = 0
 
 const Home = () => {
     const { user, setAuth } = useAuth()
@@ -14,15 +27,22 @@ const Home = () => {
 
     console.log("user: ", user)
 
-    // const onLogout = async () => {
-    //     // setAuth(null)
-    //     const { error } = await supabase.auth.signOut()
+    const [posts, setPosts] = useState([])
 
-    //     if (error) {
-    //         Alert.alert("Sign Out", "Theres was an error signing out!")
-    //         return
-    //     }
-    // }
+    useEffect(() => {
+        getPosts()
+    }, [])
+
+    const getPosts = async () => {
+        //call the api
+        limit = limit + 10
+        let response = await fetchPosts(limit)
+
+        if (response.success) {
+            setPosts(response.data)
+        }
+    }
+
     return (
         <ScreenWrapper bg="white">
             <View style={styles.container}>
@@ -59,7 +79,17 @@ const Home = () => {
                     </View>
                 </View>
             </View>
-            {/* <Button title="logout" onPress={onLogout} /> */}
+
+            {/**Posts */}
+            <FlatList
+                data={posts}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.listStyle}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({ item }) => (
+                    <PostCard item={item} currentUser={user} router={router} />
+                )}
+            />
         </ScreenWrapper>
     )
 }
@@ -68,7 +98,7 @@ export default Home
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
         // paddingHorizontal: wp(5)
     },
     header: {
