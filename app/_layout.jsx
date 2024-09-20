@@ -7,7 +7,11 @@ import { LogBox } from "react-native"
 
 
 {/**Logs to ignore the errors provided by the render html library */ }
-LogBox.ignoreLogs(["Warning: TNodeChildrenRenderer", ""])
+LogBox.ignoreLogs([
+    "Warning: TRenderEngineProvider",
+    "MemoizedTNodeRenderer",
+    "TNodeChildrenRenderer"
+])
 
 const _layout = () => {
     return (

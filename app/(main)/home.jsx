@@ -25,11 +25,13 @@ const Home = () => {
 
     const [posts, setPosts] = useState([])
 
+    const [hasMore, setHasMore] = useState(true)
+
     const handlePostEvent = async payload => {
         if (payload.event == "INSERT" && payload?.new?.id) {
             let newPost = { ...payload.new }
             let response = await getUserData(newPost?.userId)
-            
+
             newPost.user = response.success ? response.data : {}
             setPosts(prevPosts => [newPost, ...prevPosts])
         }
@@ -46,7 +48,8 @@ const Home = () => {
             )
             .subscribe()
 
-        getPosts()
+        //We no longer need to call the api here since we have implemented pagination
+        // getPosts()
 
         return () => {
             supabase.removeChannel(postChannel)
@@ -55,10 +58,12 @@ const Home = () => {
 
     const getPosts = async () => {
         //call the api
-        limit = limit + 10
+        if (!hasMore) return null
+        limit = limit + 5
         let response = await fetchPosts(limit)
 
         if (response.success) {
+            if (posts.length == response.data.length) setHasMore(false)
             setPosts(response.data)
         }
     }
@@ -112,15 +117,28 @@ const Home = () => {
                             router={router}
                         />
                     )}
+                    //pagination
+                    onEndReached={() => {
+                        getPosts()
+                    }}
+                    onEndReachedThreshold={0.5}
                     //loading while fetching more posts
                     ListFooterComponent={
-                        <View
-                            style={{
-                                marginVertical: posts.length == 0 ? 200 : 30
-                            }}
-                        >
-                            <Loading />
-                        </View>
+                        hasMore ? (
+                            <View
+                                style={{
+                                    marginVertical: posts.length == 0 ? 200 : 30
+                                }}
+                            >
+                                <Loading />
+                            </View>
+                        ) : (
+                            <View style={{ marginVertical: 30 }}>
+                                <Text style={styles.noPosts}>
+                                    No more posts to show!
+                                </Text>
+                            </View>
+                        )
                     }
                 />
             </View>
