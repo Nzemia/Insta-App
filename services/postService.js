@@ -36,11 +36,12 @@ export const createOrUpdatePost = async post => {
         return { success: false, msg: "Error creating post" }
     }
 }
+
 export const fetchPosts = async (limit = 10) => {
     try {
         const { data, error } = await supabase
             .from("posts")
-            .select(`*, user:users(id, name, image)`)
+            .select(`*, user:users(id, name, image), postLikes(*)`)
             .order("created_at", { ascending: false })
             .limit(limit)
 
@@ -49,9 +50,49 @@ export const fetchPosts = async (limit = 10) => {
             return { success: false, msg: "Error fetching posts" }
         }
 
-        return { success: true, data: data }
+        return { success: true }
     } catch (error) {
         console.log("Fetch post error", error)
         return { success: false, msg: "Error fetching posts" }
+    }
+}
+
+export const createPostLike = async postLike => {
+    try {
+        const { data, error } = await supabase
+            .from("postLikes")
+            .insert(postLike)
+            .select()
+            .single()
+
+        if (error) {
+            console.log("Post like error", error)
+            return { success: false, msg: "Could not like post" }
+        }
+
+        return { success: true, data: data }
+    } catch (error) {
+        console.log("Post like error", error)
+        return { success: false, msg: "Could not like post" }
+    }
+}
+
+export const removePostLike = async (postId, userId) => {
+    try {
+        const { data, error } = await supabase
+            .from("postLikes")
+            .delete()
+            .eq("userId", userId)
+            .eq("postId", postId)
+
+        if (error) {
+            console.log("Post remove error", error)
+            return { success: false, msg: "Could not remove post" }
+        }
+
+        return { success: true, data: data }
+    } catch (error) {
+        console.log("Post remove error", error)
+        return { success: false, msg: "Could not remove post" }
     }
 }

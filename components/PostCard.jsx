@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { theme } from "../constants/theme"
 import Avatar from "./Avatar"
 import { hp, wp } from "../helpers/common"
@@ -9,6 +9,7 @@ import RenderHtml from "react-native-render-html"
 import { Image } from "expo-image"
 import { getSupabaseFileUrl } from "../services/imageService"
 import { Video } from "expo-av"
+import { createPostLike, removePostLike } from "../services/postService"
 
 const textStyles = {
     color: theme.colors.dark,
@@ -38,15 +39,54 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
         elevation: 3
     }
 
+    const [likes, setLikes] = useState([])
+
+    useEffect(() => {
+        setLikes(item?.postLikes)
+    }, [])
+
     const createdAt = moment(item?.created_at).format("MMM D")
 
     const openDetails = () => {}
 
-    /**changing the color of like button */
-    const liked = false
+    const onLike = async () => {
+        if (liked) {
+            //remove like
+            let updatedLikes = likes.filter(
+                like => like.userId != currentUser?.id
+            )
 
-    // counting the likes
-    const likes = []
+            setLikes([...updatedLikes])
+
+            let response = await removePostLike(item?.id, currentUser?.id)
+
+            // console.log("removed like: ", response)
+
+            if (!response.success) {
+                Alert.alert("Post", "Something went wrong!")
+            }
+        } else {
+            //create like
+            let data = {
+                userId: currentUser?.id,
+                postId: item?.id
+            }
+
+            setLikes([...likes, data])
+
+            let response = await createPostLike(data)
+
+            // console.log("added like: ", response)
+
+            if (!response.success) {
+                Alert.alert("Post", "Something went wrong!")
+            }
+        }
+    }
+
+    const liked = likes.filter(like => like.userId == currentUser?.id)[0]
+        ? true
+        : false
 
     return (
         <View style={[styles.container, hasShadow && shadowStyles]}>
@@ -115,7 +155,7 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
             {/**Likes */}
             <View style={styles.footer}>
                 <View style={styles.footerButton}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={onLike}>
                         <Icon
                             name="heart"
                             size={24}
