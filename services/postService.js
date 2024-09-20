@@ -50,7 +50,7 @@ export const fetchPosts = async (limit = 10) => {
             return { success: false, msg: "Error fetching posts" }
         }
 
-        return { success: true }
+        return { success: true, data: data }
     } catch (error) {
         console.log("Fetch post error", error)
         return { success: false, msg: "Error fetching posts" }
@@ -90,7 +90,7 @@ export const removePostLike = async (postId, userId) => {
             return { success: false, msg: "Could not remove post" }
         }
 
-        return { success: true, data: data }
+        return { success: true }
     } catch (error) {
         console.log("Post remove error", error)
         return { success: false, msg: "Could not remove post" }

@@ -11,3 +11,8 @@ export const hp = percentage => {
 export const wp = percentage => {
     return (percentage * deviceWidth) / 100
 }
+
+/**to remove the html tags while sharing the post */
+export const removeHtmlTags = html => {
+    return html.replace(/<[^>]*>?/gm, "")
+}

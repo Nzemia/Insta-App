@@ -1,13 +1,13 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import React, { useEffect, useState } from "react"
 import { theme } from "../constants/theme"
 import Avatar from "./Avatar"
-import { hp, wp } from "../helpers/common"
+import { hp, removeHtmlTags, wp } from "../helpers/common"
 import moment from "moment"
 import Icon from "../assets/icons"
 import RenderHtml from "react-native-render-html"
 import { Image } from "expo-image"
-import { getSupabaseFileUrl } from "../services/imageService"
+import { downloadFile, getSupabaseFileUrl } from "../services/imageService"
 import { Video } from "expo-av"
 import { createPostLike, removePostLike } from "../services/postService"
 
@@ -87,6 +87,16 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
     const liked = likes.filter(like => like.userId == currentUser?.id)[0]
         ? true
         : false
+
+    const onShare = async () => {
+        let content = { message: removeHtmlTags(item?.body) }
+        if (item?.file) {
+            //download the file then share the local uri
+            let url = await downloadFile(getSupabaseFileUrl(item?.file).uri)
+            content.url = url
+        }
+        Share.share(content)
+    }
 
     return (
         <View style={[styles.container, hasShadow && shadowStyles]}>
@@ -184,7 +194,7 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
 
                 {/**Share */}
                 <View style={styles.footerButton}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={onShare}>
                         <Icon
                             name="share"
                             size={24}
