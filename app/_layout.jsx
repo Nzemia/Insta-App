@@ -3,6 +3,11 @@ import { Stack, useRouter } from "expo-router"
 import { AuthProvider, useAuth } from "../contexts/AuthContext"
 import { supabase } from "../lib/supabase"
 import { getUserData } from "../services/userService"
+import { LogBox } from "react-native"
+
+
+{/**Logs to ignore the errors provided by the render html library */ }
+LogBox.ignoreLogs(["Warning: TNodeChildrenRenderer", ""])
 
 const _layout = () => {
     return (

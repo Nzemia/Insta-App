@@ -1,7 +1,4 @@
-import {
-    Alert,
-    Button,
-    FlatList,
+import {    
     Pressable,
     StyleSheet,
     Text,
@@ -17,6 +14,7 @@ import { useRouter } from "expo-router"
 import Avatar from "../../components/Avatar"
 import { fetchPosts } from "../../services/postService"
 import PostCard from "../../components/PostCard"
+import { FlatList } from "react-native"
 
 //custom global variable for fetching posts
 var limit = 0
@@ -78,18 +76,23 @@ const Home = () => {
                         </Pressable>
                     </View>
                 </View>
-            </View>
 
-            {/**Posts */}
-            <FlatList
-                data={posts}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.listStyle}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({ item }) => (
-                    <PostCard item={item} currentUser={user} router={router} />
-                )}
-            />
+                
+                {/**Posts */}
+                <FlatList
+                    data={posts}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.listStyle}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <PostCard
+                            item={item}
+                            currentUser={user}
+                            router={router}
+                        />
+                    )}
+                />
+            </View>
         </ScreenWrapper>
     )
 }
@@ -98,7 +101,7 @@ export default Home
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
         // paddingHorizontal: wp(5)
     },
     header: {
@@ -135,8 +138,21 @@ const styles = StyleSheet.create({
         fontSize: hp(2),
         textAlign: "center",
         color: theme.colors.text
+    },
+    pill: {
+        position: "absolute",
+        right: -10,
+        top: -4,
+        height: hp(2.2),
+        width: hp(2.2),
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 20,
+        backgroundColor: theme.colors.roseLight
+    },
+    pillText: {
+        color: "white",
+        fontSize: hp(1.2),
+        fontWeight: theme.fonts.bold
     }
-    // pill: {
-    //   position:
-    // }
 })
