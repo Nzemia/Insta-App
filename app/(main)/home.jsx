@@ -1,9 +1,4 @@
-import {    
-    Pressable,
-    StyleSheet,
-    Text,
-    View
-} from "react-native"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 import React, { useEffect, useState } from "react"
 import ScreenWrapper from "../../components/ScreenWrapper"
 import { useAuth } from "../../contexts/AuthContext"
@@ -15,6 +10,7 @@ import Avatar from "../../components/Avatar"
 import { fetchPosts } from "../../services/postService"
 import PostCard from "../../components/PostCard"
 import { FlatList } from "react-native"
+import Loading from "../../components/Loading"
 
 //custom global variable for fetching posts
 var limit = 0
@@ -77,7 +73,6 @@ const Home = () => {
                     </View>
                 </View>
 
-                
                 {/**Posts */}
                 <FlatList
                     data={posts}
@@ -91,6 +86,16 @@ const Home = () => {
                             router={router}
                         />
                     )}
+                    //loading while fetching more posts
+                    ListFooterComponent={
+                        <View
+                            style={{
+                                marginVertical: posts.length == 0 ? 200 : 30
+                            }}
+                        >
+                            <Loading />
+                        </View>
+                    }
                 />
             </View>
         </ScreenWrapper>
