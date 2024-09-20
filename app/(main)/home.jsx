@@ -11,6 +11,8 @@ import { fetchPosts } from "../../services/postService"
 import PostCard from "../../components/PostCard"
 import { FlatList } from "react-native"
 import Loading from "../../components/Loading"
+import { supabase } from "../../lib/supabase"
+import { getUserData } from "../../services/userService"
 
 //custom global variable for fetching posts
 var limit = 0
@@ -23,8 +25,32 @@ const Home = () => {
 
     const [posts, setPosts] = useState([])
 
+    const handlePostEvent = async payload => {
+        if (payload.event == "INSERT" && payload?.new?.id) {
+            let newPost = { ...payload.new }
+            let response = await getUserData(newPost?.userId)
+            
+            newPost.user = response.success ? response.data : {}
+            setPosts(prevPosts => [newPost, ...prevPosts])
+        }
+    }
+
     useEffect(() => {
+        //real time updation after creating a post
+        let postChannel = supabase
+            .channel("posts")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "posts" },
+                handlePostEvent
+            )
+            .subscribe()
+
         getPosts()
+
+        return () => {
+            supabase.removeChannel(postChannel)
+        }
     }, [])
 
     const getPosts = async () => {
