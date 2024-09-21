@@ -10,6 +10,7 @@ import { Image } from "expo-image"
 import { downloadFile, getSupabaseFileUrl } from "../services/imageService"
 import { Video } from "expo-av"
 import { createPostLike, removePostLike } from "../services/postService"
+import Loading from "./Loading"
 
 const textStyles = {
     color: theme.colors.dark,
@@ -28,7 +29,13 @@ const tagsStyles = {
     }
 }
 
-const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
+const PostCard = ({
+    item,
+    currentUser,
+    router,
+    hasShadow = true,
+    showMoreIcon = true
+}) => {
     const shadowStyles = {
         shadowOffset: {
             width: 0,
@@ -41,13 +48,18 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
 
     const [likes, setLikes] = useState([])
 
+    const [loading, setLoading] = useState(false)
+
     useEffect(() => {
         setLikes(item?.postLikes)
     }, [])
 
     const createdAt = moment(item?.created_at).format("MMM D")
 
-    const openDetails = () => {}
+    const openPostDetails = () => {
+        if (!showMoreIcon) return null
+        router.push({ pathname: "postDetails", params: { postId: item?.id } })
+    }
 
     const onLike = async () => {
         if (liked) {
@@ -92,11 +104,16 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
         let content = { message: removeHtmlTags(item?.body) }
         if (item?.file) {
             //download the file then share the local uri
+            setLoading(true)
             let url = await downloadFile(getSupabaseFileUrl(item?.file).uri)
+            setLoading(false)
             content.url = url
         }
         Share.share(content)
     }
+
+    console.log("post item comments", item?.comments)
+    
 
     return (
         <View style={[styles.container, hasShadow && shadowStyles]}>
@@ -117,14 +134,17 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
                 </View>
 
                 {/**the 3 dots */}
-                <TouchableOpacity onPress={openDetails}>
-                    <Icon
-                        name="threeDotsHorizontal"
-                        size={hp(3.4)}
-                        strokeWidth={3}
-                        color={theme.colors.text}
-                    />
-                </TouchableOpacity>
+                {/**we don't want to show the 3 dots for the post when we open on the comments section, hence this condition*/}
+                {showMoreIcon && (
+                    <TouchableOpacity onPress={openPostDetails}>
+                        <Icon
+                            name="threeDotsHorizontal"
+                            size={hp(3.4)}
+                            strokeWidth={3}
+                            color={theme.colors.text}
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
 
             {/**Post body and media */}
@@ -182,25 +202,34 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
 
                 {/**Comments */}
                 <View style={styles.footerButton}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={openPostDetails}>
                         <Icon
                             name="comment"
                             size={24}
                             color={theme.colors.textLight}
                         />
                     </TouchableOpacity>
-                    <Text style={styles.count}>{0}</Text>
+                    <Text style={styles.count}>
+                        
+                        {
+                            item?.comments[0]?.count
+                        }
+                    </Text>
                 </View>
 
                 {/**Share */}
                 <View style={styles.footerButton}>
-                    <TouchableOpacity onPress={onShare}>
-                        <Icon
-                            name="share"
-                            size={24}
-                            color={theme.colors.textLight}
-                        />
-                    </TouchableOpacity>
+                    {loading ? (
+                        <Loading size="small" />
+                    ) : (
+                        <TouchableOpacity onPress={onShare}>
+                            <Icon
+                                name="share"
+                                size={24}
+                                color={theme.colors.textLight}
+                            />
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         </View>

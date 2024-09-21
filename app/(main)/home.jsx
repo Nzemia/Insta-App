@@ -37,8 +37,8 @@ const Home = () => {
         }
     }
 
+    //real time updation after creating a post
     useEffect(() => {
-        //real time updation after creating a post
         let postChannel = supabase
             .channel("posts")
             .on(
@@ -55,6 +55,9 @@ const Home = () => {
             supabase.removeChannel(postChannel)
         }
     }, [])
+
+
+    
 
     const getPosts = async () => {
         //call the api
