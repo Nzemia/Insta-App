@@ -82,7 +82,7 @@ const Home = () => {
     const getPosts = async () => {
         //call the api
         if (!hasMore) return null
-        limit = limit + 5
+        limit = limit + 4
         let response = await fetchPosts(limit)
 
         if (response.success) {

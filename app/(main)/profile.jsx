@@ -1,12 +1,13 @@
 import {
     Alert,
+    FlatList,
     Pressable,
     StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from "react-native"
-import React from "react"
+import React, { useState } from "react"
 import { useAuth } from "../../contexts/AuthContext"
 import { useRouter } from "expo-router"
 import Header from "../../components/Header"
@@ -16,10 +17,18 @@ import Icon from "../../assets/icons"
 import { theme } from "../../constants/theme"
 import { supabase } from "../../lib/supabase"
 import Avatar from "../../components/Avatar"
+import { fetchPosts } from "../../services/postService"
+import Loading from "../../components/Loading"
+import PostCard from "../../components/PostCard"
+
+var limit = 0
 
 const Profile = () => {
     const { user, setAuth } = useAuth()
     const router = useRouter()
+    const [posts, setPosts] = useState([])
+
+    const [hasMore, setHasMore] = useState(true)
 
     const onLogout = async () => {
         const { error } = await supabase.auth.signOut()
@@ -43,12 +52,59 @@ const Profile = () => {
         ])
     }
 
+    const getPosts = async () => {
+        //call the api
+        if (!hasMore) return null
+        limit = limit + 4
+        let response = await fetchPosts(limit, user.id)
+
+        if (response.success) {
+            if (posts.length == response.data.length) setHasMore(false)
+            setPosts(response.data)
+        }
+    }
+
     return (
         <ScreenWrapper bg="white">
-            <UserHeader
-                user={user}
-                router={router}
-                handleLogOut={handleLogOut}
+            <FlatList
+                data={posts}
+                ListHeaderComponent={
+                    <UserHeader
+                        user={user}
+                        router={router}
+                        handleLogOut={handleLogOut}
+                    />
+                }
+                ListHeaderComponentStyle={{marginBottom: 30}}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.listStyle}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({ item }) => (
+                    <PostCard item={item} currentUser={user} router={router} />
+                )}
+                //pagination
+                onEndReached={() => {
+                    getPosts()
+                }}
+                onEndReachedThreshold={0.5}
+                //loading while fetching more posts
+                ListFooterComponent={
+                    hasMore ? (
+                        <View
+                            style={{
+                                marginVertical: posts.length == 0 ? 200 : 30
+                            }}
+                        >
+                            <Loading />
+                        </View>
+                    ) : (
+                        <View style={{ marginVertical: 30 }}>
+                            <Text style={styles.noPosts}>
+                                No more posts to show!
+                            </Text>
+                        </View>
+                    )
+                }
             />
         </ScreenWrapper>
     )
@@ -125,11 +181,9 @@ const UserHeader = ({ user, router, handleLogOut }) => {
                             </View>
                         </View>
                     )}
-                    {
-                        user && user.bio && (
-                            <Text style={styles.infoText}>{user && user.bio}</Text>
-                        )
-                    }
+                    {user && user.bio && (
+                        <Text style={styles.infoText}>{user && user.bio}</Text>
+                    )}
                 </View>
             </View>
         </View>
