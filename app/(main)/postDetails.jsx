@@ -161,7 +161,8 @@ const PostDetails = () => {
     }
 
     const onEditPost = async item => {
-        console.log("Edit post: ", item)
+        router.back()
+        router.push({pathname: "newPost", params: {...item}})
     }
 
     return (
