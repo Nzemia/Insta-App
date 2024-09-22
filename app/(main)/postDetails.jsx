@@ -11,7 +11,8 @@ import { useLocalSearchParams, useRouter } from "expo-router"
 import {
     createComment,
     deleteComment,
-    fetchPostDetails
+    fetchPostDetails,
+    removePost
 } from "../../services/postService"
 import { hp, wp } from "../../helpers/common"
 import { theme } from "../../constants/theme"
@@ -45,14 +46,14 @@ const PostDetails = () => {
     //     getPostDetails()
     // }, [])
 
-    const handleNewComment = async (payload) => {
+    const handleNewComment = async payload => {
         console.log("Got new comment: ", payload.new)
         if (payload.new) {
             let newComment = { ...payload.new }
             let res = await getUserData(newComment.userId)
             newComment.user = res.success ? res.data : {}
 
-            setPost(prevPost => { 
+            setPost(prevPost => {
                 return {
                     ...prevPost,
                     comments: [newComment, ...prevPost.comments]
@@ -149,6 +150,20 @@ const PostDetails = () => {
         }
     }
 
+    const onDeletePost = async item => {
+        let response = await removePost(post.id)
+
+        if (response.success) {
+            router.back()
+        } else {
+            Alert.alert("Post", response.msg)
+        }
+    }
+
+    const onEditPost = async item => {
+        console.log("Edit post: ", item)
+    }
+
     return (
         <View style={styles.container}>
             <ScrollView
@@ -164,6 +179,9 @@ const PostDetails = () => {
                     router={router}
                     hasShadow={false}
                     showMoreIcon={false}
+                    showDelete={true}
+                    onDelete={onDeletePost}
+                    onEdit={onEditPost}
                 />
 
                 {/**comment input */}

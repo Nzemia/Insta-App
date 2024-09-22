@@ -31,9 +31,18 @@ const Home = () => {
         if (payload.event == "INSERT" && payload?.new?.id) {
             let newPost = { ...payload.new }
             let response = await getUserData(newPost?.userId)
+            newPost.postLikes = []
+            newPost.comments = [{ count: 0 }]
 
             newPost.user = response.success ? response.data : {}
             setPosts(prevPosts => [newPost, ...prevPosts])
+        }
+        if (payload.eventType == "DELETE" && payload.old.id) { 
+            setPosts(prevPosts => {
+                let updatedPosts = prevPosts.filter(post => post.id != payload.old.id)
+                return updatedPosts
+            })
+
         }
     }
 
@@ -55,9 +64,6 @@ const Home = () => {
             supabase.removeChannel(postChannel)
         }
     }, [])
-
-
-    
 
     const getPosts = async () => {
         //call the api

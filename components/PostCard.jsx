@@ -1,4 +1,4 @@
-import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Alert, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import React, { useEffect, useState } from "react"
 import { theme } from "../constants/theme"
 import Avatar from "./Avatar"
@@ -34,7 +34,10 @@ const PostCard = ({
     currentUser,
     router,
     hasShadow = true,
-    showMoreIcon = true
+    showMoreIcon = true,
+    showDelete = false,
+    onDelete = () => {},
+    onEdit = () => {}
 }) => {
     const shadowStyles = {
         shadowOffset: {
@@ -112,6 +115,24 @@ const PostCard = ({
         Share.share(content)
     }
 
+    const handlePostDelete = async () => { 
+        Alert.alert("Delete", "Are you sure you want to delete this post?", [
+            {
+                text: "Cancel",
+                onPress: () => console.log("modal cancelled"),
+                style: "cancel"
+            },
+            {
+                text: "Delete",
+                onPress: () => onDelete(item),
+                style: "destructive"
+            }
+        ])
+    }
+
+
+
+
     console.log("post item comments", item?.comments)
     
 
@@ -144,6 +165,26 @@ const PostCard = ({
                             color={theme.colors.text}
                         />
                     </TouchableOpacity>
+                )}
+
+                {showDelete && currentUser?.id == item?.userId && (
+                    <View style={styles.actions}>
+                        <TouchableOpacity onPress={() => onEdit(item)}>
+                            <Icon
+                                name="edit"
+                                size={hp(2.5)}
+                                strokeWidth={3}
+                                color={theme.colors.text}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={handlePostDelete}>
+                            <Icon
+                                name="delete"
+                                size={hp(2.5)}                                
+                                color={theme.colors.rose}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 )}
             </View>
 
@@ -209,12 +250,7 @@ const PostCard = ({
                             color={theme.colors.textLight}
                         />
                     </TouchableOpacity>
-                    <Text style={styles.count}>
-                        
-                        {
-                            item?.comments[0]?.count
-                        }
-                    </Text>
+                    <Text style={styles.count}>{item?.comments[0]?.count}</Text>
                 </View>
 
                 {/**Share */}
