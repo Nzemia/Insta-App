@@ -24,9 +24,10 @@ import Input from "../../components/Input"
 import CommentItem from "../../components/CommentItem"
 import { supabase } from "../../lib/supabase"
 import { getUserData } from "../../services/userService"
+import { createNotification } from "../../services/notificationService"
 
 const PostDetails = () => {
-    const { postId } = useLocalSearchParams()
+    const { postId, commentId } = useLocalSearchParams()
 
     const [post, setPost] = useState(null)
 
@@ -128,6 +129,19 @@ const PostDetails = () => {
 
         if (response.success) {
             //send notification
+            if (user.id != post.userId) {
+                let notify = {
+                    senderId: user.id,
+                    receiverId: post.userId,
+                    title: "Commented on your post",
+                    data: JSON.stringify({
+                        postId: post.id,
+                        commentId: response?.data?.id
+                    })
+                }
+                createNotification(notify)
+            }
+
             inputRef?.current?.clear()
             commentRef.current = ""
         } else {
@@ -162,7 +176,7 @@ const PostDetails = () => {
 
     const onEditPost = async item => {
         router.back()
-        router.push({pathname: "newPost", params: {...item}})
+        router.push({ pathname: "newPost", params: { ...item } })
     }
 
     return (
@@ -221,6 +235,7 @@ const PostDetails = () => {
                         <CommentItem
                             key={comment?.id?.toString()}
                             item={comment}
+                            highlight={commentId == commentId}
                             canDelete={
                                 user.id == comment.userId ||
                                 user.id == post.userId

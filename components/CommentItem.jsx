@@ -6,7 +6,12 @@ import Avatar from "./Avatar"
 import moment from "moment"
 import Icon from "../assets/icons"
 
-const CommentItem = ({ item, canDelete = false, onDelete = () => {} }) => {
+const CommentItem = ({
+    item,
+    canDelete = false,
+    onDelete = () => {},
+    highlight = false
+}) => {
     const createdAt = moment(item?.created_at).format("MMM D")
 
     const handleDelete = () => {
@@ -32,7 +37,7 @@ const CommentItem = ({ item, canDelete = false, onDelete = () => {} }) => {
         <View style={styles.container}>
             <Avatar uri={item?.user?.image} />
 
-            <View style={styles.content}>
+            <View style={[styles.content, highlight && styles.highLight]}>
                 <View
                     style={{
                         flexDirection: "row",

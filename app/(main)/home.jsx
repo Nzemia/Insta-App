@@ -27,6 +27,8 @@ const Home = () => {
 
     const [hasMore, setHasMore] = useState(true)
 
+    const [notifications, setNotifications] = useState(0)
+
     const handlePostEvent = async payload => {
         if (payload.event == "INSERT" && payload?.new?.id) {
             let newPost = { ...payload.new }
@@ -60,7 +62,13 @@ const Home = () => {
         }
     }
 
-    //real time updation after creating a post
+    const handleNewNotification = async payload => {
+        console.log("Got new notification: ", payload.new)
+        if (payload.eventType == "INSERT" && payload.new.id) {
+            setNotifications(prevNotifications => prevNotifications + 1)
+        }
+    }
+
     useEffect(() => {
         let postChannel = supabase
             .channel("posts")
@@ -74,8 +82,24 @@ const Home = () => {
         //We no longer need to call the api here since we have implemented pagination
         // getPosts()
 
+        //notification count on heart icons
+        let notificationChannel = supabase
+            .channel("notifications")
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "notifications",
+                    filter: `receiverId=eq.${user.id}`
+                },
+                handleNewNotification
+            )
+            .subscribe()
+
         return () => {
             supabase.removeChannel(postChannel)
+            supabase.removeChannel(notificationChannel)
         }
     }, [])
 
@@ -99,7 +123,10 @@ const Home = () => {
                     <Text style={styles.title}>LinkUp</Text>
                     <View style={styles.icons}>
                         <Pressable
-                            onPress={() => router.push("/notifications")}
+                            onPress={() => {
+                                setNotifications(0)
+                                router.push("/notifications")
+                            }}
                         >
                             <Icon
                                 name="heart"
@@ -107,6 +134,16 @@ const Home = () => {
                                 strokewidth={2}
                                 color={theme.colors.text}
                             />
+                            {
+                                //notification count
+                                notifications > 0 && (
+                                    <Text style={styles.pill}>
+                                        <Text style={styles.pillText}>
+                                            {notifications}
+                                        </Text>
+                                    </Text>
+                                )
+                            }
                         </Pressable>
                         <Pressable onPress={() => router.push("/newPost")}>
                             <Icon
@@ -224,7 +261,7 @@ const styles = StyleSheet.create({
     },
     pillText: {
         color: "white",
-        fontSize: hp(1.2),
+        fontSize: hp(1.5),
         fontWeight: theme.fonts.bold
     }
 })
